@@ -57,40 +57,35 @@ public:
 
 
 class Person {
-protected:
+public:
     std::string firstName;
     std::string lastName;
-public:
-    Person(
-        const std::string& first,
-        const std::string& last
-    ) : firstName(first), lastName(last) {}
-    std::string firstName;
+    std::string dateOfBirth;
     int age;
 
-    Person(const std::string& n, int a) : firstName(n), age(a) {}
+    Person(const std::string& first, const std::string& last, const std::string& dob, const int& a) : firstName(first), lastName(last), dateOfBirth(dob), age(a) {}
 
     virtual void display() const {
-        std::cout << "Имя: " << firstName << ", Возраст: " << age << std::endl;
+        std::cout << "Имя: " << firstName << ", Фамилия: " << lastName << ", ДР: " << dateOfBirth << ", Возраст: " << age << std::endl;
     }
 };
 
 class Student : public Person {
 
 protected:
-    std::string dateOfBirth;
-    std::string studentID;
     std::string email;
     std::vector<Grade> grades;
 public:
+    std::string studentID;
     Student(
         const std::string& first,
         const std::string& last,
         const std::string& dob,
+        const int& a, 
         const std::string& id,
         const std::string& mail,
         const std::vector<Grade>& gr
-    ) : Person(first, last), dateOfBirth(dob), studentID(id), email(mail), grades(gr) {}
+    ) : Person(first, last, dob, a), studentID(id), email(mail), grades(gr) {}
 
     double avgGrade() const {
         if (grades.empty()) {
@@ -104,14 +99,16 @@ public:
     }
 
     void display() const override {
-        std::cout << "Студент: " << firstName << ", Возраст: " << age << ", Номер студ. билета: " << studentID << std::endl;
+        std::cout << "Студент: " << firstName << " " << lastName << ", Номер студ. билета: " << studentID << std::endl;
     }
 
 
 
 
     static Student inputFromConsole() {
-        std::string first, last, dob, id, mail;
+        std::string first, last, dob; 
+        int a;
+        std::string id, mail;
         std::vector<Grade> grades;
 
         std::cout << "Введите имя: ";
@@ -120,6 +117,8 @@ public:
         std::cin >> last;
         std::cout << "Введите дату рождения: ";
         std::cin >> dob;
+        std::cout << "Введите возраст: ";
+        std::cin >> a;
         std::cout << "Введите номер студенческого билета: ";
         std::cin >> id;
         std::cout << "Введите email: ";
@@ -134,7 +133,7 @@ public:
             std::cin >> addGrade;
         } while (addGrade == 'y' || addGrade == 'Y');
 
-        return Student(first, last, dob, id, mail, grades);
+        return Student(first, last, dob, a, id, mail, grades);
     }
     std::string getFirstName() const {
         return firstName;
@@ -206,11 +205,12 @@ public:
         const std::string& first,
         const std::string& last,
         const std::string& dob,
+        const int& a,
         const std::string& id,
         const std::string& mail,
         const std::vector<Grade>& gr,
         const std::string& country
-    ) : Student(first, last, dob, id, mail, gr), country(country) {} 
+    ) : Student(first, last, dob, a, id, mail, gr), country(country) {} 
 
 
     void printStudent() const override {
@@ -471,5 +471,43 @@ public:
 int main() {
     setlocale(LC_ALL, "Russian");
 
+    // Создание коллекции объектов Person и Student
+    std::vector<Person*> people;
+    people.push_back(new Person("Иван", "Иванов", "01.01.2000", 4));
+    people.push_back(new Student("Анна", "Кипяткова", "02.01.2000", 8, "12345", "test@mail", {}));
+    people.push_back(new Student("Петр", "Петров", "02.01.2000", 6 ,  "67890", "test@mail", {}));
 
+    // Использование алгоритма сортировки для сортировки по возрасту
+    std::sort(people.begin(), people.end(), [](const Person* a, const Person* b) {
+        return a->age < b->age;
+        });
+
+    // Вывод отсортированной коллекции
+    std::cout << "Отсортированные объекты:" << std::endl;
+    for (const auto& person : people) {
+        person->display();
+    }
+
+    // Использование алгоритма поиска для поиска студента по номеру студ. билета
+    std::string searchID = "67890";
+    auto it = std::find_if(people.begin(), people.end(), [&searchID](const Person* p) {
+        const Student* student = dynamic_cast<const Student*>(p);
+        return student && student->studentID == searchID;
+        });
+
+    // Вывод результата поиска
+    if (it != people.end()) {
+        std::cout << "\nСтудент с номером студ. билета " << searchID << " найден:" << std::endl;
+        (*it)->display();
+    }
+    else {
+        std::cout << "\nСтудент с номером студ. билета " << searchID << " не найден." << std::endl;
+    }
+
+    // Очистка памяти
+    for (const auto& person : people) {
+        delete person;
+    }
+
+    return 0;
 }
