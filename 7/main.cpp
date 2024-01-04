@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <numeric>
 #include <stdexcept>
 
@@ -55,12 +56,28 @@ public:
 };
 
 
-
-class Student {
-
+class Person {
 protected:
     std::string firstName;
     std::string lastName;
+public:
+    Person(
+        const std::string& first,
+        const std::string& last
+    ) : firstName(first), lastName(last) {}
+    std::string firstName;
+    int age;
+
+    Person(const std::string& n, int a) : firstName(n), age(a) {}
+
+    virtual void display() const {
+        std::cout << "Имя: " << firstName << ", Возраст: " << age << std::endl;
+    }
+};
+
+class Student : public Person {
+
+protected:
     std::string dateOfBirth;
     std::string studentID;
     std::string email;
@@ -73,7 +90,7 @@ public:
         const std::string& id,
         const std::string& mail,
         const std::vector<Grade>& gr
-    ) : firstName(first), lastName(last), dateOfBirth(dob), studentID(id), email(mail), grades(gr) {}
+    ) : Person(first, last), dateOfBirth(dob), studentID(id), email(mail), grades(gr) {}
 
     double avgGrade() const {
         if (grades.empty()) {
@@ -85,6 +102,11 @@ public:
         }
         return totalScore / grades.size();
     }
+
+    void display() const override {
+        std::cout << "Студент: " << firstName << ", Возраст: " << age << ", Номер студ. билета: " << studentID << std::endl;
+    }
+
 
 
 
