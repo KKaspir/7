@@ -99,7 +99,7 @@ public:
     }
 
     void display() const override {
-        std::cout << "Студент: " << firstName << " " << lastName << ", Номер студ. билета: " << studentID << std::endl;
+        std::cout << "Студент: " << firstName << " " << lastName << ", Возраст: " << age << ", Номер студ. билета: " << studentID << std::endl;
     }
 
 
@@ -483,7 +483,7 @@ int main() {
         });
 
     // Вывод отсортированной коллекции
-    std::cout << "Отсортированные объекты:" << std::endl;
+    std::cout << "Отсортированные объекты (по возрасту):" << std::endl;
     for (const auto& person : people) {
         person->display();
     }
